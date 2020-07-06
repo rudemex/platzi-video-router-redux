@@ -2,7 +2,7 @@ Platzi-Video <3
 ==============
 home - entry point para webpack
 
-  Home - página / (container|smart)
+  Videos - página / (container|smart)
     -> <!-- Layout - UI -->
       -> Related - UI
       -> Categories - UI
