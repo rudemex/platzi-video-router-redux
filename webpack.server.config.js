@@ -1,0 +1,89 @@
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+
+module.exports = (env) => {
+  const plugins = [
+    new ExtractTextPlugin("css/[name].css"),
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css'
+    }),
+  ]
+
+  if (env.NODE_ENV === 'production') {
+    plugins.push(
+      new CleanWebpackPlugin(['dist'], {root: __dirname})
+    )
+  }
+
+  return {
+
+    entry: {
+      "app": path.resolve(__dirname, 'src/entries/app.js'),
+      //"redux": path.resolve(__dirname, 'src/entries/redux.js'),
+    },
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'ssr/[name].js',
+      publicPath: "/",
+      chunkFilename: 'js/[id].[chunkhash].js',
+      libraryTarget: "commonjs2"
+    },
+    devServer: {
+      port: 9000,
+    },
+    target: "node",
+    module: {
+      rules: [
+        {
+          // test: que tipo de archivo quiero reconocer,
+          // use: que loader se va a encargar del archivo
+          test: /\.(js|jsx)$/,
+          exclude: /(node_modules)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['es2015', 'react', 'stage-2'],
+            }
+          },
+        },
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            'css-loader',
+          ]
+        },
+        /*{
+          test: /\.css$/,
+          use: ExtractTextPlugin.extract({
+            use: [
+              {
+                loader: 'css-loader',
+                options: {
+                  minimize: true,
+                }
+              }
+            ]
+          })
+        },*/
+        {
+          test: /\.(jpg|png|gif|svg)$/,
+          use: {
+            loader: 'url-loader',
+            options: {
+              limit: 100000,
+              fallback: 'url-loader',
+              name: 'images/[name].[ext]',
+            }
+          }
+        },
+      ]
+    },
+    plugins
+  }
+}
